@@ -214,7 +214,7 @@ func benchmarkSpinLock() {
 // 测试锁是否可用
 func TestMutex(t *testing.T) {
 	t.Run("Mutex", func(t *testing.T) {
-		lock := NewMutexLock()
+		lock := newMutexLock()
 		var count int
 		var wg sync.WaitGroup
 		wg.Add(100)
@@ -235,7 +235,7 @@ func TestMutex(t *testing.T) {
 
 func TestSpinLock(t *testing.T) {
 	t.Run("SpinLock", func(t *testing.T) {
-		lock := NewSpinLock()
+		lock := newSpinLock()
 		var count int
 		var wg sync.WaitGroup
 		wg.Add(100)

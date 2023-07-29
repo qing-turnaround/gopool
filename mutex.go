@@ -27,10 +27,10 @@ func (sl *spinLock) Unlock() {
 	atomic.StoreUint32((*uint32)(sl), 0)
 }
 
-func NewSpinLock() sync.Locker {
+func newSpinLock() sync.Locker {
 	return new(spinLock)
 }
 
-func NewMutexLock() sync.Locker {
+func newMutexLock() sync.Locker {
 	return new(sync.Mutex)
 }

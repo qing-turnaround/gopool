@@ -49,7 +49,7 @@ func WithSpinLocker() func(*PoolOptions) {
 	}
 }
 
-type pool struct {
+type Pool struct {
 
 	// pool 选项配置
 	options *PoolOptions
@@ -65,14 +65,14 @@ type pool struct {
 	workerCount int32
 }
 
-func NewPool(options ...func(*PoolOptions)) pool {
+func NewPool(options ...func(*PoolOptions)) *Pool {
 	// 初始化默认配置
 	poolOptions := &PoolOptions{}
 	for _, option := range options {
 		option(poolOptions)
 	}
 
-	p := pool{
+	p := &Pool{
 		options: poolOptions,
 	}
 
@@ -87,49 +87,49 @@ func NewPool(options ...func(*PoolOptions)) pool {
 	}
 
 	if p.options.lockName == "mutex" {
-		p.taskLock = NewMutexLock()
+		p.taskLock = newMutexLock()
 	} else {
-		p.taskLock = NewSpinLock()
+		p.taskLock = newSpinLock()
 	}
 
 	return p
 }
 
-func (p *pool) Name() string {
+func (p *Pool) Name() string {
 	return p.options.name
 }
 
 // 设置任务池的大小
-func (p *pool) SetPoolSize(poolSize int32) {
+func (p *Pool) SetPoolSize(poolSize int32) {
 	atomic.StoreInt32(&p.options.poolSize, poolSize)
 }
 
 // 获取任务池的大小
-func (p *pool) Cap() int32 {
+func (p *Pool) Cap() int32 {
 	return atomic.LoadInt32(&p.options.poolSize)
 }
 
 // 执行一个任务
-func (p *pool) Go(f func()) {
+func (p *Pool) Go(f func()) {
 	p.goFunc(f)
 }
 
 // 减少worker的数量
-func (p *pool) decWorkerCount() {
+func (p *Pool) decWorkerCount() {
 	atomic.AddInt32(&p.workerCount, -1)
 }
 
 // 增加worker的数量
-func (p *pool) incWorkerCount() {
+func (p *Pool) incWorkerCount() {
 	atomic.AddInt32(&p.workerCount, 1)
 }
 
 // 获取worker的数量
-func (p *pool) getWorkerCount() int32 {
+func (p *Pool) getWorkerCount() int32 {
 	return atomic.LoadInt32(&p.workerCount)
 }
 
-func (p *pool) goFunc(f func()) {
+func (p *Pool) goFunc(f func()) {
 	// task Pool中获取一个task
 	task := taskPool.Get().(*task)
 	task.f = f

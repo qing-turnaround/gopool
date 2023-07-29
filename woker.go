@@ -15,7 +15,7 @@ func init() {
 }
 
 type worker struct {
-	pool *pool
+	pool *Pool
 }
 
 func newWorker() interface{} {
