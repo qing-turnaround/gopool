@@ -1,9 +1,14 @@
 package pool
 
 import (
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
+)
+
+var (
+	defaultPoolSize = runtime.GOMAXPROCS(0)
 )
 
 // 选项模式：用于设置任务池的属性
@@ -69,6 +74,10 @@ func NewPool(options ...func(*PoolOptions)) pool {
 
 	p := pool{
 		options: poolOptions,
+	}
+
+	if p.options.poolSize == 0 {
+		p.options.poolSize = int32(defaultPoolSize)
 	}
 
 	p.options.lockName = strings.ToLower(p.options.lockName)
